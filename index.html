@@ -1,0 +1,1154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#3340E8">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Handy Toot!</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Baloo+2:wght@600;800&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one phone-width column, four tabs on a bottom bar, full-screen scanner on top.
+   Palette: pen-ink blue accent on cool paper, kept apart from the green/amber/red status colors.
+   Type: rounded display for the name and totals, Atkinson Hyperlegible for reading, mono for sticker codes. */
+:root {
+  --bg: #F4F5FA;
+  --surface: #FFFFFF;
+  --surface-2: #E9ECF6;
+  --ink: #161A33;
+  --ink-2: #565B7A;
+  --line: #D6DAEA;
+  --accent: #3340E8;
+  --accent-ink: #FFFFFF;
+  --good: #11704F;
+  --good-ink: #FFFFFF;
+  --good-bg: #DCF2E8;
+  --warn: #7A4F00;
+  --warn-bg: #FFEFC2;
+  --bad: #B3261E;
+  --bad-bg: #FBE0DD;
+  --cam-bg: #05060D;
+  --cam-ink: #FFFFFF;
+  --font-display: "Baloo 2", ui-rounded, "Arial Rounded MT Bold", system-ui, sans-serif;
+  --font-body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "DM Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F1120; --surface: #1A1D33; --surface-2: #252945; --ink: #EDEFFB; --ink-2: #A5AACA; --line: #30345A;
+    --accent: #8E98FF; --accent-ink: #0D0F2E; --good: #5CD9A6; --good-ink: #07281D; --good-bg: #12392C;
+    --warn: #F5C451; --warn-bg: #3A2D0B; --bad: #FF8F86; --bad-bg: #3E1815; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F1120; --surface: #1A1D33; --surface-2: #252945; --ink: #EDEFFB; --ink-2: #A5AACA; --line: #30345A;
+  --accent: #8E98FF; --accent-ink: #0D0F2E; --good: #5CD9A6; --good-ink: #07281D; --good-bg: #12392C;
+  --warn: #F5C451; --warn-bg: #3A2D0B; --bad: #FF8F86; --bad-bg: #3E1815; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  background: var(--bg); color: var(--ink);
+  font: 400 16px/1.45 var(--font-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  -webkit-text-size-adjust: 100%;
+}
+body.noscroll { overflow: hidden; }
+.app { max-width: 560px; margin: 0 auto; padding-block: 10px 110px; }
+h1, h2, h3, p { margin: 0; }
+h1 { font: 800 26px/1.1 var(--font-display); letter-spacing: 0.01em; }
+h2 { font: 700 13px/1.2 var(--font-body); text-transform: uppercase; letter-spacing: 0.09em; color: var(--ink-2); margin: 22px 0 10px; }
+.mono { font-family: var(--font-mono); font-size: 0.92em; }
+.num { font-variant-numeric: tabular-nums; }
+.muted { color: var(--ink-2); }
+.top { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding-bottom: 12px; }
+.sub { color: var(--ink-2); font-size: 14px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 99px; font-size: 13px; font-weight: 700; background: var(--surface-2); color: var(--ink-2); white-space: nowrap; }
+.chip.good { background: var(--good-bg); color: var(--good); }
+.chip.warn { background: var(--warn-bg); color: var(--warn); }
+.chip.bad { background: var(--bad-bg); color: var(--bad); }
+.banner { padding: 10px 12px; border-radius: 10px; background: var(--warn-bg); color: var(--warn); font-size: 14px; margin-bottom: 12px; }
+.banner.bad { background: var(--bad-bg); color: var(--bad); }
+.tab[hidden] { display: none; }
+
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.btn { min-height: 48px; padding: 0 18px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--surface); font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.good { background: var(--good); border-color: var(--good); color: var(--good-ink); }
+.btn.danger { color: var(--bad); border-color: var(--bad); }
+.btn.big { width: 100%; min-height: 58px; font-size: 18px; }
+.btn.small { min-height: 38px; padding: 0 12px; font-size: 14px; border-radius: 10px; }
+.btn:disabled { opacity: 0.5; cursor: default; }
+.btn.armed { background: var(--bad); border-color: var(--bad); color: #fff; }
+.field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.field label { font-size: 14px; font-weight: 700; color: var(--ink-2); }
+input[type=text], input[type=search], input[type=number], textarea {
+  width: 100%; min-height: 48px; padding: 0 12px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--surface); min-width: 0;
+}
+textarea { padding: 10px 12px; min-height: 140px; font-family: var(--font-mono); font-size: 13px; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.row > .grow { flex: 1 1 140px; min-width: 0; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.card { background: var(--surface); border: 1.5px solid var(--line); border-radius: 14px; padding: 14px; }
+.stack { display: flex; flex-direction: column; gap: 12px; }
+
+/* Sell */
+.empty { padding: 22px 14px; text-align: center; color: var(--ink-2); border: 1.5px dashed var(--line); border-radius: 14px; }
+.lines { display: flex; flex-direction: column; gap: 8px; }
+.line { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; padding: 12px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; align-items: center; }
+.line-name { font-weight: 700; overflow-wrap: anywhere; }
+.line-meta { color: var(--ink-2); font-size: 14px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.line-total { font-weight: 700; text-align: right; min-width: 64px; }
+.qty { display: inline-flex; align-items: center; gap: 4px; }
+.qty button { width: 44px; height: 44px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--surface-2); font-size: 22px; font-weight: 700; line-height: 1; }
+.qty span { min-width: 30px; text-align: center; font-weight: 700; font-size: 18px; }
+.line-right { display: flex; align-items: center; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+.pay { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+.total-row { display: flex; align-items: baseline; justify-content: space-between; }
+.total-row span { color: var(--ink-2); font-weight: 700; }
+.total-row strong { font: 800 42px/1 var(--font-display); }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.seg { min-height: 44px; padding: 0 16px; border-radius: 99px; border: 1.5px solid var(--line); background: var(--surface); font-weight: 700; }
+.seg[aria-pressed="true"], .seg[aria-checked="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.change { font: 700 22px/1.2 var(--font-display); min-height: 28px; }
+.change.short { color: var(--bad); }
+.last { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border-radius: 12px; background: var(--good-bg); color: var(--good); font-weight: 700; margin-top: 12px; flex-wrap: wrap; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.tile { text-align: left; padding: 10px 12px; min-height: 76px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--surface); display: flex; flex-direction: column; justify-content: space-between; gap: 6px; min-width: 0; }
+.tile-name { font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
+.tile-meta { display: flex; justify-content: space-between; align-items: center; gap: 6px; font-size: 14px; color: var(--ink-2); }
+.tile.noprice { border-style: dashed; }
+.tile > .chip { align-self: flex-start; }
+
+/* Items */
+.list { display: flex; flex-direction: column; gap: 8px; }
+.item { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; text-align: left; padding: 12px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--surface); width: 100%; align-items: center; }
+.item .nm { font-weight: 700; overflow-wrap: anywhere; }
+.item .cd { color: var(--ink-2); font-size: 14px; }
+.item .right { text-align: right; display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+.qrow { display: grid; grid-template-columns: 1fr 92px 82px; gap: 8px; align-items: center; padding: 8px 10px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; }
+.qrow input { min-height: 44px; padding: 0 8px; text-align: right; }
+.qhead { display: grid; grid-template-columns: 1fr 92px 82px; gap: 8px; padding: 0 10px; font-size: 13px; font-weight: 700; color: var(--ink-2); text-align: right; }
+.qhead span:first-child { text-align: left; }
+
+/* Stickers */
+.presets { display: grid; gap: 8px; }
+.preset { text-align: left; padding: 12px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--surface); display: flex; flex-direction: column; gap: 2px; }
+.preset[aria-checked="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1.5px var(--accent); }
+.preset b { font-weight: 700; }
+.preview-wrap { background: var(--surface-2); border-radius: 12px; padding: 10px; }
+.preview-wrap canvas { width: 100%; height: auto; display: block; background: #fff; border-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.25); }
+.pager { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 10px; }
+details summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-weight: 700; }
+.copies { display: grid; grid-template-columns: 1fr 78px; gap: 8px; align-items: center; padding: 6px 0; border-top: 1px solid var(--line); }
+.copies input { min-height: 40px; text-align: right; padding: 0 8px; }
+
+/* Sales */
+.summary { display: flex; flex-direction: column; gap: 4px; }
+.summary strong { font: 800 38px/1.05 var(--font-display); }
+.sale { padding: 12px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; display: grid; grid-template-columns: 1fr auto; gap: 6px 10px; }
+.sale.void { opacity: 0.6; }
+.sale.void .sale-total { text-decoration: line-through; }
+.sale-total { font-weight: 800; text-align: right; }
+.sale-lines { color: var(--ink-2); font-size: 14px; grid-column: 1 / -1; overflow-wrap: anywhere; }
+
+/* Nav, toast, overlays */
+.nav { position: fixed; left: 0; right: 0; bottom: 0; background: var(--surface); border-top: 1.5px solid var(--line); padding: 6px max(16px, env(safe-area-inset-right, 0px)) env(safe-area-inset-bottom, 0px) max(16px, env(safe-area-inset-left, 0px)); z-index: 20; }
+.nav-in { max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.nav button { min-height: 56px; border: 0; background: none; font-weight: 700; font-size: 14px; color: var(--ink-2); border-radius: 10px; position: relative; }
+.nav button[aria-current="page"] { color: var(--accent); background: var(--surface-2); }
+.nav .badge { position: absolute; top: 4px; right: 14%; min-width: 22px; height: 22px; border-radius: 99px; background: var(--accent); color: var(--accent-ink); font-size: 13px; line-height: 22px; padding: 0 6px; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(78px + env(safe-area-inset-bottom, 0px)); max-width: min(92vw, 520px); background: var(--ink); color: var(--bg); padding: 12px 16px; border-radius: 12px; font-weight: 700; z-index: 40; box-shadow: 0 6px 24px rgba(0,0,0,0.3); }
+.toast.bad { background: var(--bad); color: #fff; }
+.overlay { position: fixed; inset: 0; z-index: 50; }
+.scanner { background: var(--cam-bg); color: var(--cam-ink); display: flex; flex-direction: column; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
+.scan-top { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; gap: 10px; }
+.scan-top h2 { margin: 0; color: var(--cam-ink); font-size: 16px; }
+.scan-view { position: relative; flex: 1; min-height: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.scan-view video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.reticle { position: relative; width: min(82%, 420px); aspect-ratio: 2.4 / 1; border-radius: 14px; border: 3px solid rgba(255,255,255,0.85); box-shadow: 0 0 0 9999px rgba(0,0,0,0.45); transition: border-color 0.15s; }
+.reticle.ok { border-color: #5CD9A6; }
+.reticle.no { border-color: #FF8F86; }
+.scan-note { position: relative; z-index: 1; padding: 20px; text-align: center; max-width: 340px; }
+.scan-bottom { padding: 12px 16px 16px; display: flex; flex-direction: column; gap: 10px; }
+.scan-msg { font-weight: 700; font-size: 17px; min-height: 26px; text-align: center; }
+.scan-msg.bad { color: #FF8F86; }
+.scan-msg.ok { color: #5CD9A6; }
+.scan-cart { text-align: center; color: rgba(255,255,255,0.75); font-size: 14px; }
+.scanner .btn { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3); color: var(--cam-ink); }
+.scanner .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.sheet { background: rgba(10, 12, 30, 0.55); display: flex; align-items: flex-end; justify-content: center; }
+.sheet-body { width: 100%; max-width: 560px; max-height: 92%; overflow-y: auto; background: var(--bg); border-radius: 18px 18px 0 0; padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 12px; }
+.sheet-body h2 { margin: 0; }
+.err { color: var(--bad); font-weight: 700; min-height: 0; }
+.barprev { background: #fff; border-radius: 8px; padding: 8px; align-self: flex-start; max-width: 100%; overflow-x: auto; }
+.barprev canvas { display: block; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="top">
+    <div>
+      <h1>Handy Toot!</h1>
+      <p class="sub" id="eventSub"></p>
+    </div>
+    <span class="chip" id="status"></span>
+  </header>
+  <div id="banner"></div>
+
+  <main>
+    <section class="tab" id="tab-sell" aria-label="Sell">
+      <button class="btn primary big" id="btnScan" type="button">Scan sticker</button>
+      <div class="field" style="margin-top:12px">
+        <label for="q">Or type a code or item name</label>
+        <input id="q" type="search" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="done" placeholder="MAG-01 or “magic”">
+      </div>
+      <div id="lastSale"></div>
+      <h2>Cart</h2>
+      <div id="cart"></div>
+      <div id="pay"></div>
+      <h2>Tap to add</h2>
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <section class="tab" id="tab-items" aria-label="Items" hidden>
+      <div class="row">
+        <div class="chips grow" role="group" aria-label="View">
+          <button class="seg" type="button" id="viewDetails" aria-pressed="true">Details</button>
+          <button class="seg" type="button" id="viewQuick" aria-pressed="false">Prices &amp; stock</button>
+        </div>
+        <button class="btn small" type="button" id="btnNew">Add item</button>
+      </div>
+      <div class="field" style="margin-top:12px">
+        <label for="iq">Search items</label>
+        <input id="iq" type="search" autocomplete="off" spellcheck="false" placeholder="Name or code">
+      </div>
+      <div id="priceNote" style="margin-top:12px"></div>
+      <h2 id="itemsHead">Items</h2>
+      <div id="itemList"></div>
+    </section>
+
+    <section class="tab" id="tab-stickers" aria-label="Stickers" hidden>
+      <p class="muted">Print on A4 sticker paper, with the printer set to <b>Actual size</b> (not “Fit to page”), so the bars keep their width. One sticker per item type is enough: stick them on the products, or on a catalog board by your till.</p>
+      <h2>Branding</h2>
+      <div class="field"><label for="brand">Brand name on each sticker (optional)</label><input id="brand" type="text" autocomplete="off" maxlength="24" placeholder="Your shop name"></div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn small" type="button" id="btnLogo">Add logo</button>
+        <button class="btn small" type="button" id="btnLogoRm" hidden>Remove logo</button>
+      </div>
+      <input type="file" id="logoIn" accept="image/*" hidden>
+      <h2>Label size</h2>
+      <div class="presets" id="presets" role="radiogroup" aria-label="Label size"></div>
+      <label class="row" style="margin-top:12px; min-height:44px"><input type="checkbox" id="guides" style="width:22px;height:22px"> <span>Dotted cut guides</span></label>
+      <h2>Copies</h2>
+      <div class="row">
+        <button class="btn small" type="button" id="cp1">1 each</button>
+        <button class="btn small" type="button" id="cpStock">Match stock</button>
+        <button class="btn small" type="button" id="cp0">None</button>
+      </div>
+      <details style="margin-top:6px">
+        <summary>Set copies per item</summary>
+        <div id="copiesList"></div>
+      </details>
+      <h2>Preview</h2>
+      <p id="sheetInfo" class="muted" style="margin-bottom:10px"></p>
+      <div class="preview-wrap"><canvas id="sheetCanvas" aria-label="Sticker sheet preview"></canvas></div>
+      <div class="pager">
+        <button class="btn small" type="button" id="pgPrev" aria-label="Previous page">‹</button>
+        <span id="pgInfo" class="num"></span>
+        <button class="btn small" type="button" id="pgNext" aria-label="Next page">›</button>
+      </div>
+      <div class="stack" style="margin-top:14px">
+        <button class="btn primary big" type="button" id="btnPdf">Save sticker PDF</button>
+      </div>
+    </section>
+
+    <section class="tab" id="tab-sales" aria-label="Sales" hidden>
+      <div id="salesSummary"></div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn primary" type="button" id="btnCsv">Save CSV</button>
+        <button class="btn" type="button" id="btnCopy">Copy CSV</button>
+      </div>
+      <p class="muted" style="margin-top:8px;font-size:14px">Save a CSV every so often during the day. It is your backup if the phone dies.</p>
+      <h2>Sales</h2>
+      <div class="list" id="salesList"></div>
+      <div style="margin-top:20px" id="clearZone"></div>
+      <h2>Event</h2>
+      <div class="field"><label for="eventName">Event name shown at the top</label><input id="eventName" type="text" autocomplete="off" maxlength="40"></div>
+    </section>
+  </main>
+</div>
+
+<nav class="nav" aria-label="Sections">
+  <div class="nav-in">
+    <button type="button" data-tab="sell" aria-current="page">Sell<span class="badge num" id="navBadge" hidden>0</span></button>
+    <button type="button" data-tab="items">Items</button>
+    <button type="button" data-tab="stickers">Stickers</button>
+    <button type="button" data-tab="sales">Sales</button>
+  </div>
+</nav>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<div class="overlay scanner" id="scanner" role="dialog" aria-modal="true" aria-label="Scan stickers" hidden>
+  <div class="scan-top">
+    <h2>Scan stickers</h2>
+    <button class="btn small" type="button" id="btnScanDone">Done</button>
+  </div>
+  <div class="scan-view" id="scanView">
+    <video id="video" playsinline muted></video>
+    <div class="reticle" id="reticle"></div>
+    <div class="scan-note" id="scanNote" hidden></div>
+  </div>
+  <div class="scan-bottom">
+    <div class="scan-msg" id="scanMsg" aria-live="polite"></div>
+    <div class="scan-cart num" id="scanCart"></div>
+    <div class="row">
+      <button class="btn grow" type="button" id="btnPhoto">Take photo instead</button>
+      <button class="btn" type="button" id="btnTorch" hidden>Light</button>
+    </div>
+    <input type="file" id="photoIn" accept="image/*" capture="environment" hidden>
+  </div>
+</div>
+
+<div class="overlay sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden>
+  <div class="sheet-body">
+    <h2 id="sheetTitle">Edit item</h2>
+    <div class="field"><label for="fName">Name</label><input id="fName" type="text" autocomplete="off" maxlength="60"></div>
+    <div class="two">
+      <div class="field"><label for="fPrice">Price (₱)</label><input id="fPrice" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></div>
+      <div class="field"><label for="fStock">In stock</label><input id="fStock" type="text" inputmode="numeric" autocomplete="off" placeholder="not counted"></div>
+    </div>
+    <label class="row" style="min-height:44px"><input type="checkbox" id="fFree" style="width:22px;height:22px"> <span>Free giveaway (no price needed)</span></label>
+    <div class="field"><label for="fCode">Sticker code</label><input id="fCode" type="text" class="mono" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="14"></div>
+    <div class="barprev"><canvas id="fBar" aria-label="Barcode preview"></canvas></div>
+    <p class="muted" id="fCodeNote" style="font-size:14px" hidden>Stickers you already printed with the old code will stop matching this item.</p>
+    <p class="err" id="fErr" role="alert"></p>
+    <div class="row">
+      <button class="btn primary grow" type="button" id="fSave">Save</button>
+      <button class="btn" type="button" id="fCancel">Cancel</button>
+      <button class="btn danger" type="button" id="fDel">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay sheet" id="copyBox" role="dialog" aria-modal="true" aria-label="Copy text" hidden>
+  <div class="sheet-body">
+    <h2>Copy this text</h2>
+    <p class="muted">Copying did not work here. Press and hold the text, choose Select all, then Copy.</p>
+    <textarea id="copyArea" readonly></textarea>
+    <button class="btn primary" type="button" id="copyClose">Close</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(function () {
+'use strict';
+
+//#BARCODE-START
+// Code 128, subset B (ASCII 32-126). Each entry is bar, space, bar, space, bar, space widths; the stop is 7 long.
+var PATTERNS = [
+'212222','222122','222221','121223','121322','131222','122213','122312','132212','221213',
+'221312','231212','112232','122132','122231','113222','123122','123221','223211','221132',
+'221231','213212','223112','312131','311222','321122','321221','312212','322112','322211',
+'212123','212321','232121','111323','131123','131321','112313','132113','132311','211313',
+'231113','231311','112133','112331','132131','113123','113321','133121','313121','211331',
+'231131','213113','213311','213131','311123','311321','331121','312113','312311','332111',
+'314111','221411','431111','111224','111422','121124','121421','141122','141221','112214',
+'112412','122114','122411','142112','142211','241211','221114','413111','241112','134111',
+'111242','121142','121241','114212','124112','124211','411212','421112','421211','212141',
+'214121','412121','111143','111341','131141','114113','114311','411113','411311','113141',
+'114131','311141','411131','211412','211214','211232','2331112'
+];
+function code128B(text) {
+  var vals = [104], i, c;
+  for (i = 0; i < text.length; i++) {
+    c = text.charCodeAt(i);
+    if (c < 32 || c > 126) throw new Error('Unsupported character: ' + text.charAt(i));
+    vals.push(c - 32);
+  }
+  var sum = 104;
+  for (i = 1; i < vals.length; i++) sum += vals[i] * i;
+  vals.push(sum % 103);
+  vals.push(106);
+  var widths = [];
+  vals.forEach(function (v) { PATTERNS[v].split('').forEach(function (d) { widths.push(+d); }); });
+  return { values: vals, widths: widths, modules: widths.reduce(function (a, b) { return a + b; }, 0) };
+}
+function drawBars(ctx, widths, x, y, mod, h) {
+  var cx = x;
+  for (var i = 0; i < widths.length; i++) {
+    var w = widths[i] * mod;
+    if (i % 2 === 0) ctx.fillRect(cx, y, w, h);
+    cx += w;
+  }
+}
+//#BARCODE-END
+
+var $ = function (s, el) { return (el || document).querySelector(s); };
+var KEY = 'bazaar-pos-v1';
+var METHODS = ['Cash', 'GCash', 'Maya', 'Other'];
+
+var SEED = [
+  ['MAG-01', 'Magic pencil'], ['DRB-01', 'Drawing book (theme)'], ['DRP-01', 'Drawing pad'],
+  ['CRY-01', 'Crayons'], ['COL-01', 'Coloring book'], ['STK-01', 'Stickers'],
+  ['WSH-01', 'Washi tape'], ['NTB-01', 'Writing notebook'], ['STN-01', 'Stencil'], ['SJN-01', 'Sticker journal'],
+  ['TOT-01', 'Tote: tic-tac-toe'], ['TOT-02', 'Tote: cute cartoons'], ['TOT-03', 'Tote: fun colors'],
+  ['PRS-01', 'Purse: tic-tac-toe'], ['PRS-02', 'Purse: snakes & ladders'], ['PRS-03', 'Purse: chess'],
+  ['NPD-01', 'Notepad: cutesy'], ['NPD-02', 'Notepad: to-do'], ['CLP-01', 'Paper clips'],
+  ['CAL-01', 'Mini desk calendar'], ['CMS-01', 'Drawing commission', null], ['PIN-01', 'Make-your-own pin', null],
+  ['KEY-01', 'Keychain: quotes'], ['KEY-02', 'Keychain: characters'], ['KEY-03', 'Keychain: art'],
+  ['PRT-01', 'Art print'], ['SET-01', 'Sticker set + free album'], ['WRY-01', 'Worry stone'],
+  ['JWL-01', 'Kids jewelry'], ['ORI-01', 'Origami set'], ['ZIN-01', 'Free mini comic zine', 20, true]
+];
+
+var PRESETS = {
+  catalog: { label: 'Catalog board', w: 62, h: 34, mod: 5, nameK: 0.125, desc: '62 × 34 mm · large, for a board by your till' },
+  standard: { label: 'Standard', w: 40, h: 20, mod: 3, nameK: 0.15, desc: '40 × 20 mm · for most items' },
+  compact: { label: 'Compact', w: 32, h: 16, mod: 3, nameK: 0.16, desc: '32 × 16 mm · small items, most labels per page' }
+};
+
+var state = {
+  items: SEED.map(function (s) { return { code: s[0], name: s[1], price: 0, stock: s.length > 2 ? s[2] : 10, free: !!s[3] }; }),
+  sales: [], cart: [], nextSaleNo: 1, method: 'Cash', tendered: '', last: null,
+  copies: {}, preset: 'standard', guides: true, brand: '', logo: '', eventName: 'Founder’s Bazaar · Nov 28',
+  tab: 'sell', quick: false, page: 0, editing: null
+};
+var storageOk = true;
+
+/* ---------- storage ---------- */
+function save() {
+  try {
+    localStorage.setItem(KEY, JSON.stringify({
+      v: 2, items: state.items, sales: state.sales, cart: state.cart, nextSaleNo: state.nextSaleNo,
+      method: state.method, copies: state.copies, preset: state.preset, guides: state.guides,
+      brand: state.brand, logo: state.logo, eventName: state.eventName, seedV: 2
+    }));
+    storageOk = true;
+  } catch (e) { storageOk = false; }
+  renderStatus();
+}
+function load() {
+  try {
+    var raw = localStorage.getItem(KEY);
+    if (!raw) { localStorage.setItem(KEY + '-test', '1'); localStorage.removeItem(KEY + '-test'); return; }
+    var d = JSON.parse(raw);
+    if (d && Array.isArray(d.items)) {
+      state.items = d.items; state.sales = d.sales || []; state.cart = d.cart || [];
+      state.nextSaleNo = d.nextSaleNo || 1; state.method = d.method || 'Cash';
+      state.copies = d.copies || {}; state.preset = PRESETS[d.preset] ? d.preset : 'standard';
+      state.guides = d.guides !== false;
+      if (typeof d.eventName === 'string') state.eventName = d.eventName;
+      state.brand = d.brand || ''; state.logo = d.logo || '';
+      if (!(d.seedV >= 2) && !state.items.some(function (i) { return i.code === 'ZIN-01'; })) {
+        state.items.push({ code: 'ZIN-01', name: 'Free mini comic zine', price: 0, stock: 20, free: true });
+      }
+    }
+  } catch (e) { storageOk = false; }
+}
+
+/* ---------- helpers ---------- */
+function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+function round2(n) { return Math.round(n * 100) / 100; }
+function peso(n) {
+  n = Number(n) || 0;
+  return '₱' + n.toLocaleString('en-PH', { minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 });
+}
+function parseMoney(v) { return Number(String(v).replace(/[₱,\s]/g, '')); }
+function normCode(s) { return String(s).toUpperCase().replace(/\s+/g, ''); }
+function findItem(code) { code = normCode(code); return state.items.find(function (i) { return i.code === code; }); }
+function needsPrice(it) { return !it.free && !(it.price > 0); }
+function priceLabel(it) { return it.price > 0 ? peso(it.price) : 'Free'; }
+function sortedItems() { return state.items.slice().sort(function (a, b) { return a.code < b.code ? -1 : a.code > b.code ? 1 : 0; }); }
+function cartTotal() {
+  return round2(state.cart.reduce(function (s, l) { var it = findItem(l.code); return s + (it && !l.gift ? it.price * l.qty : 0); }, 0));
+}
+function pad2(n) { return String(n).padStart(2, '0'); }
+function stamp(t) { var d = new Date(t); return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()) + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes()); }
+function clock(t) { return new Date(t).toLocaleTimeString('en-PH', { hour: 'numeric', minute: '2-digit' }); }
+
+var toastTimer = null;
+function toast(msg, kind) {
+  var t = $('#toast');
+  t.textContent = msg; t.className = 'toast' + (kind === 'bad' ? ' bad' : ''); t.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function () { t.hidden = true; }, 2800);
+}
+var armTimers = {};
+function arm(btn, armedText, action) {
+  if (btn.dataset.armed === '1') { clearTimeout(armTimers[btn.id || armedText]); btn.dataset.armed = ''; action(); return; }
+  var orig = btn.textContent;
+  btn.dataset.armed = '1'; btn.textContent = armedText; btn.classList.add('armed');
+  armTimers[btn.id || armedText] = setTimeout(function () { btn.dataset.armed = ''; btn.textContent = orig; btn.classList.remove('armed'); }, 3000);
+}
+
+/* ---------- cart + sales ---------- */
+function addToCart(code, qty) {
+  var it = findItem(code);
+  if (!it) return { ok: false, reason: 'unknown' };
+  if (needsPrice(it)) return { ok: false, reason: 'noprice', item: it };
+  var line = state.cart.find(function (l) { return l.code === it.code && !l.gift; });
+  if (line) line.qty += (qty || 1); else state.cart.push({ code: it.code, qty: qty || 1 });
+  state.last = null;
+  save(); renderSell();
+  return { ok: true, item: it };
+}
+function completeSale() {
+  if (!state.cart.length) return;
+  var lines = state.cart.map(function (l) { var it = findItem(l.code); var o = { code: it.code, name: it.name, price: l.gift ? 0 : it.price, qty: l.qty }; if (l.gift) o.gift = true; return o; });
+  var total = round2(lines.reduce(function (s, l) { return s + l.price * l.qty; }, 0));
+  var tendered = null;
+  if (state.method === 'Cash' && String(state.tendered).trim() !== '') {
+    tendered = parseMoney(state.tendered);
+    if (isNaN(tendered) || tendered < total) { toast('Cash received is less than the total.', 'bad'); return; }
+  }
+  var sale = { no: state.nextSaleNo++, t: new Date().toISOString(), method: state.method, lines: lines, total: total, tendered: tendered, change: tendered === null ? null : round2(tendered - total), void: false };
+  lines.forEach(function (l) { var it = findItem(l.code); if (it && it.stock !== null) it.stock -= l.qty; });
+  state.sales.push(sale);
+  state.cart = []; state.tendered = ''; state.last = sale.no;
+  save(); renderSell();
+  toast('Sale #' + sale.no + ' saved · ' + peso(total));
+}
+function voidSale(no) {
+  var s = state.sales.find(function (x) { return x.no === no; });
+  if (!s || s.void) return;
+  s.void = true;
+  s.lines.forEach(function (l) { var it = findItem(l.code); if (it && it.stock !== null) it.stock += l.qty; });
+  if (state.last === no) state.last = null;
+  save(); renderSell(); renderSales();
+  toast('Sale #' + no + ' voided. Stock put back.');
+}
+
+/* ---------- tabs ---------- */
+function showTab(name) {
+  state.tab = name;
+  ['sell', 'items', 'stickers', 'sales'].forEach(function (t) { $('#tab-' + t).hidden = t !== name; });
+  document.querySelectorAll('.nav button').forEach(function (b) { if (b.dataset.tab === name) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+  if (name === 'items') renderItems();
+  if (name === 'stickers') renderStickers();
+  if (name === 'sales') renderSales();
+  if (name === 'sell') renderSell();
+  window.scrollTo(0, 0);
+}
+
+/* ---------- render: header ---------- */
+function renderStatus() {
+  $('#eventSub').textContent = state.eventName;
+  var s = $('#status');
+  if (storageOk) { s.className = 'chip good'; s.textContent = 'Saved on this phone'; $('#banner').innerHTML = ''; }
+  else {
+    s.className = 'chip bad'; s.textContent = 'Not saving';
+    $('#banner').innerHTML = '<div class="banner bad">This browser view cannot store data. Sales will be lost if you close or reload the page. Save a CSV from the Sales tab often.</div>';
+  }
+}
+
+/* ---------- render: sell ---------- */
+function stockChip(it) {
+  if (it.stock === null) return '';
+  if (it.stock <= 0) return '<span class="chip bad">Out</span>';
+  if (it.stock <= 2) return '<span class="chip warn">Low · ' + it.stock + '</span>';
+  return '<span class="chip">' + it.stock + ' left</span>';
+}
+function renderSell() {
+  var count = state.cart.reduce(function (s, l) { return s + l.qty; }, 0);
+  var badge = $('#navBadge'); badge.hidden = !count; badge.textContent = count;
+
+  var last = state.sales.find(function (s) { return s.no === state.last && !s.void; });
+  $('#lastSale').innerHTML = (last && !state.cart.length)
+    ? '<div class="last"><span class="num">Sale #' + last.no + ' · ' + peso(last.total) + ' · ' + esc(last.method) + (last.change !== null ? ' · Change ' + peso(last.change) : '') + '</span>' +
+      '<button class="btn small" type="button" data-void="' + last.no + '">Undo sale</button></div>'
+    : '';
+
+  var cart = $('#cart');
+  if (!state.cart.length) {
+    cart.innerHTML = '<div class="empty">Nothing yet. Scan a sticker or tap an item below.</div>';
+    $('#pay').innerHTML = '';
+  } else {
+    cart.innerHTML = '<div class="lines">' + state.cart.map(function (l) {
+      var it = findItem(l.code); if (!it) return '';
+      var inCart = state.cart.reduce(function (n, x) { return n + (x.code === l.code ? x.qty : 0); }, 0);
+      var over = it.stock !== null && inCart > it.stock ? '<span class="chip warn">Only ' + Math.max(it.stock, 0) + ' in stock</span>' : '';
+      var gift = !!l.gift, canGift = !it.free && it.price > 0;
+      return '<div class="line" data-code="' + esc(it.code) + '" data-gift="' + (gift ? '1' : '') + '">' +
+        '<div><div class="line-name">' + esc(it.name) + '</div><div class="line-meta"><span class="mono">' + esc(it.code) + '</span>' + (gift ? '<span class="chip good">Giveaway</span>' : '<span class="num">' + (it.price > 0 ? peso(it.price) + ' each' : 'Free') + '</span>') + over + '</div></div>' +
+        '<div class="line-total num">' + (gift ? 'Free' : peso(round2(it.price * l.qty))) + '</div>' +
+        '<div class="qty"><button type="button" data-act="dec" aria-label="One less ' + esc(it.name) + '">−</button><span class="num">' + l.qty + '</span><button type="button" data-act="inc" aria-label="One more ' + esc(it.name) + '">+</button></div>' +
+        '<div class="line-right">' + (gift ? '<button class="btn small" type="button" data-act="ungift">Charge 1</button>' : (canGift ? '<button class="btn small" type="button" data-act="gift">Give 1 free</button>' : '')) + '<button class="btn small" type="button" data-act="rm">Remove</button></div>' +
+        '</div>';
+    }).join('') + '</div>';
+    renderPay();
+  }
+  renderGrid();
+}
+function renderPay() {
+  var total = cartTotal();
+  var cash = state.method === 'Cash';
+  $('#pay').innerHTML = '<div class="card pay">' +
+    '<div class="total-row"><span>Total</span><strong class="num">' + peso(total) + '</strong></div>' +
+    '<div class="chips" role="radiogroup" aria-label="Payment method">' + METHODS.map(function (m) {
+      return '<button class="seg" type="button" role="radio" aria-checked="' + (m === state.method) + '" data-method="' + m + '">' + m + '</button>';
+    }).join('') + '</div>' +
+    (cash ? '<div class="field"><label for="tender">Cash received (optional)</label><input id="tender" type="text" inputmode="decimal" autocomplete="off" value="' + esc(state.tendered) + '" placeholder="e.g. 500"></div>' +
+      '<div class="chips"><button class="seg" type="button" data-tender="exact">Exact</button>' + [100, 200, 500, 1000].map(function (n) { return '<button class="seg" type="button" data-tender="' + n + '" aria-pressed="false">' + n + '</button>'; }).join('') + '</div>' +
+      '<div class="change num" id="changeOut" aria-live="polite"></div>' : '') +
+    '<button class="btn good big" type="button" id="btnCharge">Complete sale · ' + peso(total) + '</button>' +
+    '<button class="btn small" type="button" id="btnClearCart">Clear cart</button>' +
+    '</div>';
+  updateChange();
+}
+function updateChange() {
+  var out = $('#changeOut'); if (!out) return;
+  var t = String(state.tendered).trim();
+  if (t === '') { out.textContent = ''; out.classList.remove('short'); return; }
+  var v = parseMoney(t), total = cartTotal();
+  if (isNaN(v)) { out.textContent = ''; return; }
+  if (v >= total) { out.textContent = 'Change ' + peso(round2(v - total)); out.classList.remove('short'); }
+  else { out.textContent = 'Short by ' + peso(round2(total - v)); out.classList.add('short'); }
+}
+function matches(it, q) {
+  q = q.trim().toLowerCase();
+  return !q || it.code.toLowerCase().indexOf(q) >= 0 || it.name.toLowerCase().indexOf(q) >= 0;
+}
+function renderGrid() {
+  var q = $('#q').value;
+  var list = sortedItems().filter(function (it) { return matches(it, q); });
+  $('#grid').innerHTML = list.length ? list.map(function (it) {
+    var np = needsPrice(it);
+    return '<button class="tile' + (np ? ' noprice' : '') + '" type="button" data-add="' + esc(it.code) + '">' +
+      '<span class="tile-name">' + esc(it.name) + '</span>' +
+      '<span class="tile-meta"><span class="mono">' + esc(it.code) + '</span><span class="num">' + (np ? 'No price' : priceLabel(it)) + '</span></span>' +
+      stockChip(it) + '</button>';
+  }).join('') : '<div class="empty" style="grid-column:1/-1">No item matches “' + esc(q) + '”.</div>';
+}
+function handleAdd(code) {
+  var r = addToCart(code);
+  if (r.ok) { toast('Added ' + r.item.name); return r; }
+  if (r.reason === 'noprice') toast(r.item.name + ' has no price yet. Set it in Items.', 'bad');
+  else toast('No item with code ' + code + '.', 'bad');
+  return r;
+}
+
+/* ---------- render: items ---------- */
+function renderItems() {
+  var q = $('#iq').value;
+  var list = sortedItems().filter(function (it) { return matches(it, q); });
+  var noPrice = state.items.filter(needsPrice).length;
+  $('#priceNote').innerHTML = noPrice ? '<div class="banner">' + noPrice + ' item' + (noPrice > 1 ? 's' : '') + ' still need a price. Items without a price can’t be sold.</div>' : '';
+  $('#viewDetails').setAttribute('aria-pressed', !state.quick);
+  $('#viewQuick').setAttribute('aria-pressed', state.quick);
+  $('#itemsHead').textContent = list.length + ' item' + (list.length === 1 ? '' : 's');
+  var box = $('#itemList');
+  if (!list.length) { box.innerHTML = '<div class="empty">No item matches.</div>'; return; }
+  if (state.quick) {
+    box.innerHTML = '<div class="list"><div class="qhead"><span>Item</span><span>Price ₱</span><span>Stock</span></div>' + list.map(function (it) {
+      return '<div class="qrow"><div><div class="nm" style="font-weight:700;overflow-wrap:anywhere">' + esc(it.name) + '</div><div class="muted mono" style="font-size:13px">' + esc(it.code) + '</div></div>' +
+        '<input type="text" inputmode="decimal" autocomplete="off" aria-label="Price of ' + esc(it.name) + '" data-q="price" data-code="' + esc(it.code) + '" value="' + (it.price > 0 ? it.price : '') + '" placeholder="0">' +
+        '<input type="text" inputmode="numeric" autocomplete="off" aria-label="Stock of ' + esc(it.name) + '" data-q="stock" data-code="' + esc(it.code) + '" value="' + (it.stock === null ? '' : it.stock) + '" placeholder="–"></div>';
+    }).join('') + '</div>';
+  } else {
+    box.innerHTML = '<div class="list">' + list.map(function (it) {
+      return '<button class="item" type="button" data-edit="' + esc(it.code) + '">' +
+        '<span><span class="nm">' + esc(it.name) + '</span><br><span class="cd mono">' + esc(it.code) + '</span></span>' +
+        '<span class="right"><span class="num" style="font-weight:700">' + (needsPrice(it) ? '<span class="chip warn">No price</span>' : priceLabel(it)) + '</span>' + stockChip(it) + '</span></button>';
+    }).join('') + '</div>';
+  }
+}
+
+/* ---------- edit sheet ---------- */
+function drawPreviewBar() {
+  var cv = $('#fBar'), ctx = cv.getContext('2d'), code = normCode($('#fCode').value);
+  try {
+    if (!code) throw new Error('empty');
+    var b = code128B(code), mod = 2, q = 10 * mod;
+    cv.width = b.modules * mod + q * 2; cv.height = 64;
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height);
+    ctx.fillStyle = '#000'; drawBars(ctx, b.widths, q, 4, mod, 56);
+  } catch (e) { cv.width = 10; cv.height = 4; }
+}
+function openSheet(code) {
+  var it = code ? findItem(code) : null;
+  state.editing = it ? it.code : null;
+  $('#sheetTitle').textContent = it ? 'Edit item' : 'New item';
+  $('#fName').value = it ? it.name : '';
+  $('#fPrice').value = it && it.price > 0 ? it.price : '';
+  $('#fStock').value = it && it.stock !== null ? it.stock : (it ? '' : '10');
+  $('#fCode').value = it ? it.code : '';
+  $('#fFree').checked = !!(it && it.free);
+  $('#fErr').textContent = ''; $('#fCodeNote').hidden = true;
+  $('#fDel').hidden = !it; $('#fDel').textContent = 'Delete'; $('#fDel').classList.remove('armed'); $('#fDel').dataset.armed = '';
+  $('#sheet').hidden = false; document.body.classList.add('noscroll');
+  drawPreviewBar();
+  $('#fName').focus();
+}
+function closeSheet() { $('#sheet').hidden = true; document.body.classList.remove('noscroll'); }
+function saveSheet() {
+  var name = $('#fName').value.trim(), code = normCode($('#fCode').value);
+  var priceRaw = $('#fPrice').value.trim(), stockRaw = $('#fStock').value.trim();
+  var err = '';
+  var free = $('#fFree').checked;
+  var price = free || priceRaw === '' ? 0 : parseMoney(priceRaw);
+  var stock = stockRaw === '' ? null : Number(stockRaw);
+  if (!name) err = 'Give the item a name.';
+  else if (!code) err = 'The sticker code is empty.';
+  else if (!/^[A-Z0-9][A-Z0-9._-]*$/.test(code)) err = 'Use letters, numbers and dashes in the code, with no spaces.';
+  else if (state.items.some(function (i) { return i.code === code && i.code !== state.editing; })) err = 'Another item already uses that code.';
+  else if (isNaN(price) || price < 0) err = 'Price must be a number, like 120 or 49.50.';
+  else if (stock !== null && (!Number.isInteger(stock) || stock < 0)) err = 'Stock must be a whole number, or empty if you do not count it.';
+  if (err) { $('#fErr').textContent = err; return; }
+  price = round2(price);
+  if (state.editing) {
+    var it = findItem(state.editing);
+    if (it.code !== code) {
+      state.cart.forEach(function (l) { if (l.code === it.code) l.code = code; });
+      if (state.copies[it.code] !== undefined) { state.copies[code] = state.copies[it.code]; delete state.copies[it.code]; }
+    }
+    it.name = name; it.code = code; it.price = price; it.stock = stock; it.free = free;
+  } else {
+    state.items.push({ code: code, name: name, price: price, stock: stock, free: free });
+  }
+  save(); closeSheet(); renderItems(); renderSell();
+  toast('Saved ' + name);
+}
+function deleteSheetItem() {
+  var code = state.editing; if (!code) return;
+  state.items = state.items.filter(function (i) { return i.code !== code; });
+  state.cart = state.cart.filter(function (l) { return l.code !== code; });
+  delete state.copies[code];
+  save(); closeSheet(); renderItems(); renderSell();
+  toast('Item deleted');
+}
+
+/* ---------- stickers ---------- */
+var FONT = '"Atkinson Hyperlegible", system-ui, "Segoe UI", Roboto, sans-serif';
+var MONO = '"DM Mono", ui-monospace, Menlo, Consolas, monospace';
+function copiesOf(it) { var c = state.copies[it.code]; return c === undefined ? 1 : c; }
+function expandLabels() {
+  var out = [];
+  sortedItems().forEach(function (it) { for (var i = 0; i < copiesOf(it); i++) out.push(it); });
+  return out;
+}
+function gridOf(P) { return { cols: Math.floor(194 / P.w), rows: Math.floor(277 / P.h) }; }
+function pageCount() {
+  var g = gridOf(PRESETS[state.preset]);
+  return Math.max(1, Math.ceil(expandLabels().length / (g.cols * g.rows)));
+}
+function fitText(ctx, t, maxW) {
+  if (ctx.measureText(t).width <= maxW) return t;
+  var s = t;
+  while (s.length > 1 && ctx.measureText(s + '…').width > maxW) s = s.slice(0, -1);
+  return s.replace(/\s+$/, '') + '…';
+}
+function drawLabel(ctx, it, x, y, w, h, dpi, P) {
+  x = Math.round(x); y = Math.round(y); w = Math.round(w); h = Math.round(h);
+  if (state.guides) {
+    var dash = Math.max(2, Math.round(dpi / 50));
+    ctx.strokeStyle = '#b4b4b4'; ctx.lineWidth = Math.max(1, Math.round(dpi / 300));
+    ctx.setLineDash([dash, dash]); ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1); ctx.setLineDash([]);
+  }
+  var pad = Math.round(h * 0.07), nf = Math.round(h * P.nameK), cf = Math.round(nf * 0.85);
+  ctx.fillStyle = '#000'; ctx.textBaseline = 'top';
+  var priceTxt = needsPrice(it) ? '' : priceLabel(it);
+  ctx.font = '700 ' + nf + 'px ' + FONT;
+  var pw = priceTxt ? ctx.measureText(priceTxt).width : 0;
+  ctx.textAlign = 'right'; if (priceTxt) ctx.fillText(priceTxt, x + w - pad, y + pad);
+  ctx.font = '700 ' + nf + 'px ' + FONT; ctx.textAlign = 'left';
+  ctx.fillText(fitText(ctx, it.name, w - pad * 3 - pw), x + pad, y + pad);
+  var b = code128B(it.code), mod = Math.max(1, Math.round(P.mod * dpi / 300));
+  while (b.modules * mod > w - pad * 2 && mod > 1) mod--;
+  var bw = b.modules * mod, bx = x + Math.round((w - bw) / 2);
+  var top = y + pad + Math.round(nf * 1.25) + Math.round(h * 0.03);
+  var codeY = y + h - pad - Math.round(cf * 1.2);
+  var bh = codeY - top - Math.round(h * 0.02);
+  drawBars(ctx, b.widths, bx, top, mod, bh);
+  ctx.font = '500 ' + cf + 'px ' + MONO;
+  if (state.brand || logoImg) {
+    var lx = x + pad;
+    if (logoImg) {
+      var lgh = Math.round(cf * 1.15), lgw = Math.round(lgh * logoImg.width / logoImg.height);
+      ctx.drawImage(logoImg, lx, codeY - Math.round(cf * 0.1), lgw, lgh);
+      lx += lgw + Math.round(pad * 0.6);
+    }
+    ctx.textAlign = 'right'; ctx.fillText(it.code, x + w - pad, codeY);
+    var cw = ctx.measureText(it.code).width;
+    if (state.brand) {
+      ctx.font = '700 ' + cf + 'px ' + FONT; ctx.textAlign = 'left';
+      ctx.fillText(fitText(ctx, state.brand, x + w - pad - cw - pad - lx), lx, codeY);
+    }
+  } else {
+    ctx.textAlign = 'center'; ctx.fillText(it.code, x + w / 2, codeY);
+  }
+}
+var logoImg = null;
+function loadLogo() {
+  if (!state.logo) { logoImg = null; return; }
+  var im = new Image();
+  im.onload = function () { logoImg = im; if (state.tab === 'stickers') drawPreview(); };
+  im.src = state.logo;
+}
+function renderSheet(canvas, pageIdx, dpi) {
+  var s = dpi / 25.4, W = Math.round(210 * s), H = Math.round(297 * s);
+  canvas.width = W; canvas.height = H;
+  var ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+  var P = PRESETS[state.preset], g = gridOf(P), per = g.cols * g.rows;
+  var lw = P.w * s, lh = P.h * s;
+  var gx = (210 - g.cols * P.w) / 2 * s, gy = (297 - g.rows * P.h) / 2 * s;
+  var labels = expandLabels(), start = pageIdx * per;
+  for (var i = 0; i < per; i++) {
+    var it = labels[start + i]; if (!it) break;
+    drawLabel(ctx, it, gx + (i % g.cols) * lw, gy + Math.floor(i / g.cols) * lh, lw, lh, dpi, P);
+  }
+}
+function renderStickers() {
+  $('#presets').innerHTML = Object.keys(PRESETS).map(function (k) {
+    var P = PRESETS[k], g = gridOf(P);
+    return '<button class="preset" type="button" role="radio" aria-checked="' + (k === state.preset) + '" data-preset="' + k + '"><b>' + P.label + '</b><span class="muted" style="font-size:14px">' + P.desc + ' · ' + g.cols * g.rows + ' per page</span></button>';
+  }).join('');
+  $('#guides').checked = state.guides;
+  if (document.activeElement !== $('#brand')) $('#brand').value = state.brand;
+  $('#btnLogo').textContent = state.logo ? 'Change logo' : 'Add logo';
+  $('#btnLogoRm').hidden = !state.logo;
+  $('#copiesList').innerHTML = sortedItems().map(function (it) {
+    return '<div class="copies"><label for="cp-' + esc(it.code) + '"><span style="font-weight:700">' + esc(it.name) + '</span> <span class="muted mono" style="font-size:13px">' + esc(it.code) + '</span></label>' +
+      '<input id="cp-' + esc(it.code) + '" type="number" inputmode="numeric" min="0" max="99" data-copies="' + esc(it.code) + '" value="' + copiesOf(it) + '"></div>';
+  }).join('');
+  drawPreview();
+}
+function drawPreview() {
+  var labels = expandLabels(), pages = pageCount();
+  if (state.page >= pages) state.page = pages - 1;
+  if (state.page < 0) state.page = 0;
+  var noPrice = state.items.filter(needsPrice).length;
+  $('#sheetInfo').textContent = labels.length + ' label' + (labels.length === 1 ? '' : 's') + ' on ' + pages + ' page' + (pages === 1 ? '' : 's') + (noPrice ? '. ' + noPrice + ' items have no price yet, so their labels show only the name and code.' : '.');
+  $('#pgInfo').textContent = 'Page ' + (state.page + 1) + ' of ' + pages;
+  $('#pgPrev').disabled = state.page <= 0; $('#pgNext').disabled = state.page >= pages - 1;
+  $('#btnPdf').disabled = !labels.length;
+  renderSheet($('#sheetCanvas'), state.page, 150);
+}
+async function savePdf() {
+  if (!window.jspdf) { toast('The PDF tool did not load. Check your internet and reload the page.', 'bad'); return; }
+  var labels = expandLabels(); if (!labels.length) return;
+  var btn = $('#btnPdf'); btn.disabled = true; var orig = btn.textContent; btn.textContent = 'Building PDF…';
+  try {
+    var doc = new window.jspdf.jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
+    var cv = document.createElement('canvas'), pages = pageCount();
+    for (var p = 0; p < pages; p++) {
+      renderSheet(cv, p, 300);
+      if (p > 0) doc.addPage('a4', 'portrait');
+      doc.addImage(cv.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+      await new Promise(function (r) { setTimeout(r, 0); });
+    }
+    await saveFile('handy-toot-stickers.pdf', doc.output('arraybuffer'));
+  } catch (e) { toast('Could not build the PDF.', 'bad'); }
+  btn.disabled = false; btn.textContent = orig;
+}
+
+/* ---------- sales ---------- */
+function renderSales() {
+  if (document.activeElement !== $('#eventName')) $('#eventName').value = state.eventName;
+  var act = state.sales.filter(function (s) { return !s.void; });
+  var total = round2(act.reduce(function (s, x) { return s + x.total; }, 0));
+  var pieces = act.reduce(function (s, x) { return s + x.lines.reduce(function (a, l) { return a + l.qty; }, 0); }, 0);
+  var gifts = act.reduce(function (s, x) { return s + x.lines.reduce(function (a, l) { return a + (l.gift ? l.qty : 0); }, 0); }, 0);
+  var by = {};
+  act.forEach(function (s) { by[s.method] = round2((by[s.method] || 0) + s.total); });
+  $('#salesSummary').innerHTML = '<div class="card summary"><span class="muted" style="font-weight:700">Total sales</span><strong class="num">' + peso(total) + '</strong>' +
+    '<span class="muted num">' + act.length + ' sale' + (act.length === 1 ? '' : 's') + ' · ' + pieces + ' piece' + (pieces === 1 ? '' : 's') + (gifts ? ' · ' + gifts + ' given free' : '') + '</span>' +
+    (act.length ? '<span class="num">' + Object.keys(by).map(function (m) { return esc(m) + ' ' + peso(by[m]); }).join(' · ') + '</span>' : '') + '</div>';
+  var list = state.sales.slice().reverse();
+  $('#salesList').innerHTML = list.length ? list.map(function (s) {
+    return '<div class="sale' + (s.void ? ' void' : '') + '">' +
+      '<div><b class="num">#' + s.no + '</b> <span class="muted num">' + clock(s.t) + '</span> <span class="chip">' + esc(s.method) + '</span>' + (s.void ? ' <span class="chip bad">Voided</span>' : '') + '</div>' +
+      '<div class="sale-total num">' + peso(s.total) + '</div>' +
+      '<div class="sale-lines">' + s.lines.map(function (l) { return l.qty + ' × ' + esc(l.name) + (l.gift ? ' (free)' : ''); }).join(', ') + '</div>' +
+      (s.void ? '' : '<div><button class="btn small" type="button" id="void-' + s.no + '" data-voidarm="' + s.no + '">Void</button></div>') + '</div>';
+  }).join('') : '<div class="empty">No sales yet.</div>';
+  $('#clearZone').innerHTML = state.sales.length ? '<button class="btn small danger" type="button" id="btnClearSales">Clear all sales (for test runs)</button>' : '';
+}
+function csvCell(v) { var s = String(v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }
+function buildCsv() {
+  var rows = [['sale_no', 'time', 'payment', 'code', 'item', 'qty', 'unit_price', 'line_total', 'voided', 'giveaway']];
+  state.sales.forEach(function (s) {
+    s.lines.forEach(function (l) { rows.push([s.no, stamp(s.t), s.method, l.code, l.name, l.qty, l.price, round2(l.price * l.qty), s.void ? 'yes' : '', l.gift ? 'yes' : '']); });
+  });
+  return rows.map(function (r) { return r.map(csvCell).join(','); }).join('\n') + '\n';
+}
+async function saveFile(filename, data) {
+  var dl = null;
+  if (window.claude && window.claude.use) { try { dl = await window.claude.use('downloads'); } catch (e) { dl = null; } }
+  if (dl) {
+    try { await dl.save({ filename: filename, data: data }); toast('Saved ' + filename); }
+    catch (e) { if (!(e && e.code === 'declined')) toast('Could not save the file here.', 'bad'); }
+    return;
+  }
+  if (window.claude) { toast('Saving files is not available in this view.', 'bad'); return; }
+  var blob = data instanceof Blob ? data : new Blob([data]);
+  var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+}
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); toast('Copied'); }
+  catch (e) { $('#copyArea').value = text; $('#copyBox').hidden = false; $('#copyArea').focus(); $('#copyArea').select(); }
+}
+
+/* ---------- scanner ---------- */
+var scan = { stream: null, timer: null, detector: null, busy: false, last: '', lastAt: 0, open: false, torch: false, audio: null };
+function setScanMsg(t, kind) { var m = $('#scanMsg'); m.textContent = t; m.className = 'scan-msg' + (kind ? ' ' + kind : ''); }
+function updateScanCart() {
+  var n = state.cart.reduce(function (s, l) { return s + l.qty; }, 0);
+  $('#scanCart').textContent = n ? 'Cart: ' + n + ' piece' + (n === 1 ? '' : 's') + ' · ' + peso(cartTotal()) : 'Cart is empty';
+}
+function beep(ok) {
+  try {
+    var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+    if (!scan.audio) scan.audio = new AC();
+    var o = scan.audio.createOscillator(), g = scan.audio.createGain();
+    o.frequency.value = ok ? 880 : 220; g.gain.value = 0.08; o.connect(g); g.connect(scan.audio.destination);
+    o.start(); o.stop(scan.audio.currentTime + (ok ? 0.09 : 0.22));
+  } catch (e) {}
+  try { if (navigator.vibrate) navigator.vibrate(ok ? 40 : [60, 40, 60]); } catch (e) {}
+}
+function flash(kind) { var r = $('#reticle'); r.className = 'reticle ' + kind; setTimeout(function () { r.className = 'reticle'; }, 450); }
+function onCode(raw, force) {
+  var code = normCode(raw), now = Date.now();
+  if (!force && code === scan.last && now - scan.lastAt < 1700) { scan.lastAt = now; return; }
+  scan.last = code; scan.lastAt = now;
+  var r = addToCart(code);
+  if (r.ok) { beep(true); flash('ok'); setScanMsg('Added ' + r.item.name + ' · ' + priceLabel(r.item), 'ok'); }
+  else if (r.reason === 'noprice') { beep(false); flash('no'); setScanMsg(r.item.name + ' has no price yet.', 'bad'); }
+  else { beep(false); flash('no'); setScanMsg('Unknown code: ' + code.slice(0, 24), 'bad'); }
+  updateScanCart();
+}
+async function ensureDetector() {
+  if (scan.detector) return true;
+  if (!('BarcodeDetector' in window)) return false;
+  try {
+    var f = await window.BarcodeDetector.getSupportedFormats();
+    if (f.indexOf('code_128') < 0) return false;
+    scan.detector = new window.BarcodeDetector({ formats: ['code_128'] });
+    return true;
+  } catch (e) { return false; }
+}
+function stopLive() {
+  clearTimeout(scan.timer); scan.timer = null;
+  if (scan.stream) { scan.stream.getTracks().forEach(function (t) { t.stop(); }); scan.stream = null; }
+  var v = $('#video'); v.srcObject = null; scan.torch = false; $('#btnTorch').hidden = true;
+}
+function loop() {
+  if (!scan.open || !scan.stream) return;
+  scan.timer = setTimeout(async function () {
+    var v = $('#video');
+    if (!scan.busy && v.readyState >= 2) {
+      scan.busy = true;
+      try { var r = await scan.detector.detect(v); if (r.length) onCode(r[0].rawValue); } catch (e) {}
+      scan.busy = false;
+    }
+    loop();
+  }, 130);
+}
+async function startLive() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error('nocam');
+  scan.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
+  var v = $('#video'); v.srcObject = scan.stream; await v.play();
+  var tr = scan.stream.getVideoTracks()[0], caps = tr.getCapabilities ? tr.getCapabilities() : {};
+  $('#btnTorch').hidden = !caps.torch;
+  loop();
+}
+function showNote(text) { var n = $('#scanNote'); n.textContent = text; n.hidden = !text; $('#reticle').hidden = !!text; $('#video').hidden = !!text; }
+async function openScanner() {
+  $('#scanner').hidden = false; document.body.classList.add('noscroll'); scan.open = true;
+  $('#btnPhoto').classList.remove('primary'); $('#btnPhoto').hidden = false;
+  showNote(''); updateScanCart(); setScanMsg('Starting camera…');
+  if (!(await ensureDetector())) {
+    showNote('This browser can’t read barcodes. Open the page in Chrome on Android, or type the code instead.');
+    $('#btnPhoto').hidden = true; setScanMsg(''); return;
+  }
+  try { await startLive(); setScanMsg('Point at a sticker'); }
+  catch (e) {
+    stopLive();
+    showNote('The live camera isn’t available in this view. Tap “Take photo” and the sticker is read from the picture.');
+    $('#btnPhoto').classList.add('primary'); setScanMsg('');
+  }
+}
+function closeScanner() {
+  scan.open = false; stopLive(); $('#scanner').hidden = true; document.body.classList.remove('noscroll');
+  renderSell();
+}
+async function readPhoto(file) {
+  if (!file) return;
+  if (!(await ensureDetector())) { setScanMsg('This browser can’t read barcodes.', 'bad'); return; }
+  setScanMsg('Reading photo…');
+  var bmp;
+  try { bmp = await createImageBitmap(file, { resizeWidth: 1600 }); }
+  catch (e) { try { bmp = await createImageBitmap(file); } catch (e2) { setScanMsg('Could not open that photo.', 'bad'); return; } }
+  try {
+    var r = await scan.detector.detect(bmp);
+    if (!r.length) { beep(false); flash('no'); setScanMsg('No barcode found. Move closer, keep the sticker flat and in focus, then try again.', 'bad'); }
+    else onCode(r[0].rawValue, true);
+  } catch (e) { setScanMsg('Could not read that photo.', 'bad'); }
+  if (bmp.close) bmp.close();
+}
+
+/* ---------- events ---------- */
+document.querySelector('.nav').addEventListener('click', function (e) { var b = e.target.closest('button[data-tab]'); if (b) showTab(b.dataset.tab); });
+
+$('#btnScan').addEventListener('click', openScanner);
+$('#btnScanDone').addEventListener('click', closeScanner);
+$('#btnPhoto').addEventListener('click', function () { $('#photoIn').click(); });
+$('#photoIn').addEventListener('change', function (e) { var f = e.target.files && e.target.files[0]; e.target.value = ''; readPhoto(f); });
+$('#btnTorch').addEventListener('click', async function () {
+  try { var tr = scan.stream.getVideoTracks()[0]; scan.torch = !scan.torch; await tr.applyConstraints({ advanced: [{ torch: scan.torch }] }); } catch (e) { scan.torch = false; }
+});
+
+$('#q').addEventListener('input', renderGrid);
+$('#q').addEventListener('keydown', function (e) {
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  var v = e.target.value.trim(); if (!v) return;
+  var exact = findItem(v), list = state.items.filter(function (it) { return matches(it, v); });
+  var pick = exact || (list.length === 1 ? list[0] : null);
+  if (!pick) { toast(list.length ? 'Several items match. Tap the one you want.' : 'No item matches.', 'bad'); return; }
+  var r = handleAdd(pick.code);
+  if (r.ok) { e.target.value = ''; renderGrid(); }
+});
+$('#grid').addEventListener('click', function (e) { var b = e.target.closest('[data-add]'); if (b) handleAdd(b.dataset.add); });
+$('#lastSale').addEventListener('click', function (e) { var b = e.target.closest('[data-void]'); if (b) voidSale(Number(b.dataset.void)); });
+$('#cart').addEventListener('click', function (e) {
+  var b = e.target.closest('[data-act]'); if (!b) return;
+  var el = b.closest('.line'), code = el.dataset.code, isGift = el.dataset.gift === '1';
+  var line = state.cart.find(function (l) { return l.code === code && !!l.gift === isGift; });
+  if (!line) return;
+  if (b.dataset.act === 'gift' || b.dataset.act === 'ungift') {
+    var other = state.cart.find(function (l) { return l.code === code && !!l.gift !== isGift; });
+    if (other) other.qty++;
+    else {
+      var nl = { code: code, qty: 1 }; if (!isGift) nl.gift = true;
+      state.cart.splice(state.cart.indexOf(line) + (isGift ? 0 : 1), 0, nl);
+    }
+    line.qty--; if (line.qty <= 0) state.cart = state.cart.filter(function (l) { return l !== line; });
+  }
+  else if (b.dataset.act === 'inc') line.qty++;
+  else if (b.dataset.act === 'dec') { line.qty--; if (line.qty <= 0) state.cart = state.cart.filter(function (l) { return l !== line; }); }
+  else state.cart = state.cart.filter(function (l) { return l !== line; });
+  save(); renderSell();
+});
+$('#pay').addEventListener('click', function (e) {
+  var m = e.target.closest('[data-method]'), t = e.target.closest('[data-tender]');
+  if (m) { state.method = m.dataset.method; if (state.method !== 'Cash') state.tendered = ''; save(); renderPay(); return; }
+  if (t) { state.tendered = t.dataset.tender === 'exact' ? String(cartTotal()) : t.dataset.tender; renderPay(); return; }
+  if (e.target.closest('#btnCharge')) { completeSale(); return; }
+  var c = e.target.closest('#btnClearCart');
+  if (c) arm(c, 'Tap again to clear', function () { state.cart = []; state.tendered = ''; save(); renderSell(); });
+});
+$('#pay').addEventListener('input', function (e) { if (e.target.id === 'tender') { state.tendered = e.target.value; updateChange(); } });
+
+$('#iq').addEventListener('input', renderItems);
+$('#viewDetails').addEventListener('click', function () { state.quick = false; renderItems(); });
+$('#viewQuick').addEventListener('click', function () { state.quick = true; renderItems(); });
+$('#btnNew').addEventListener('click', function () { openSheet(null); });
+$('#itemList').addEventListener('click', function (e) { var b = e.target.closest('[data-edit]'); if (b) openSheet(b.dataset.edit); });
+$('#itemList').addEventListener('change', function (e) {
+  var f = e.target.dataset.q; if (!f) return;
+  var it = findItem(e.target.dataset.code); if (!it) return;
+  var v = e.target.value.trim();
+  if (f === 'price') {
+    var p = v === '' ? 0 : parseMoney(v);
+    if (isNaN(p) || p < 0) { toast('Price must be a number.', 'bad'); e.target.value = it.price > 0 ? it.price : ''; return; }
+    it.price = round2(p); if (p > 0) it.free = false;
+  } else {
+    var s = v === '' ? null : Number(v);
+    if (s !== null && (!Number.isInteger(s) || s < 0)) { toast('Stock must be a whole number.', 'bad'); e.target.value = it.stock === null ? '' : it.stock; return; }
+    it.stock = s;
+  }
+  save();
+  var noPrice = state.items.filter(needsPrice).length;
+  $('#priceNote').innerHTML = noPrice ? '<div class="banner">' + noPrice + ' item' + (noPrice > 1 ? 's' : '') + ' still need a price.</div>' : '';
+});
+
+$('#fCode').addEventListener('input', function () {
+  drawPreviewBar();
+  $('#fCodeNote').hidden = !(state.editing && normCode($('#fCode').value) !== state.editing);
+});
+$('#fSave').addEventListener('click', saveSheet);
+$('#fCancel').addEventListener('click', closeSheet);
+$('#fDel').addEventListener('click', function () { arm($('#fDel'), 'Tap again to delete', deleteSheetItem); });
+$('#sheet').addEventListener('click', function (e) { if (e.target.id === 'sheet') closeSheet(); });
+$('#copyClose').addEventListener('click', function () { $('#copyBox').hidden = true; });
+
+$('#presets').addEventListener('click', function (e) { var b = e.target.closest('[data-preset]'); if (!b) return; state.preset = b.dataset.preset; state.page = 0; save(); renderStickers(); });
+$('#brand').addEventListener('input', function (e) { state.brand = e.target.value.trim(); save(); drawPreview(); });
+$('#btnLogo').addEventListener('click', function () { $('#logoIn').click(); });
+$('#btnLogoRm').addEventListener('click', function () { state.logo = ''; save(); loadLogo(); renderStickers(); });
+$('#logoIn').addEventListener('change', async function (e) {
+  var f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f) return;
+  try {
+    var bmp = await createImageBitmap(f), k = Math.min(1, 240 / bmp.height, 480 / bmp.width);
+    var c = document.createElement('canvas');
+    c.width = Math.max(1, Math.round(bmp.width * k)); c.height = Math.max(1, Math.round(bmp.height * k));
+    c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+    state.logo = c.toDataURL('image/png'); save(); loadLogo(); renderStickers(); toast('Logo added');
+  } catch (err) { toast('Could not open that image.', 'bad'); }
+});
+$('#guides').addEventListener('change', function (e) { state.guides = e.target.checked; save(); drawPreview(); });
+$('#eventName').addEventListener('input', function (e) { state.eventName = e.target.value; save(); });
+$('#cp1').addEventListener('click', function () { state.items.forEach(function (i) { state.copies[i.code] = 1; }); save(); renderStickers(); });
+$('#cp0').addEventListener('click', function () { state.items.forEach(function (i) { state.copies[i.code] = 0; }); save(); renderStickers(); });
+$('#cpStock').addEventListener('click', function () { state.items.forEach(function (i) { state.copies[i.code] = i.stock === null ? 1 : Math.min(99, Math.max(0, i.stock)); }); save(); renderStickers(); });
+$('#copiesList').addEventListener('change', function (e) {
+  var c = e.target.dataset.copies; if (!c) return;
+  var n = Math.max(0, Math.min(99, parseInt(e.target.value, 10) || 0));
+  state.copies[c] = n; e.target.value = n; save(); drawPreview();
+});
+$('#pgPrev').addEventListener('click', function () { state.page--; drawPreview(); });
+$('#pgNext').addEventListener('click', function () { state.page++; drawPreview(); });
+$('#btnPdf').addEventListener('click', savePdf);
+
+$('#btnCsv').addEventListener('click', function () {
+  if (!state.sales.length) { toast('No sales to save yet.'); return; }
+  saveFile('handy-toot-sales-' + stamp(Date.now()).slice(0, 10) + '.csv', buildCsv());
+});
+$('#btnCopy').addEventListener('click', function () { if (!state.sales.length) { toast('No sales to copy yet.'); return; } copyText(buildCsv()); });
+$('#salesList').addEventListener('click', function (e) {
+  var b = e.target.closest('[data-voidarm]'); if (!b) return;
+  arm(b, 'Tap again to void', function () { voidSale(Number(b.dataset.voidarm)); });
+});
+$('#clearZone').addEventListener('click', function (e) {
+  var b = e.target.closest('#btnClearSales'); if (!b) return;
+  arm(b, 'Tap again: clear all sales', function () {
+    state.sales.forEach(function (s) { if (!s.void) s.lines.forEach(function (l) { var it = findItem(l.code); if (it && it.stock !== null) it.stock += l.qty; }); });
+    state.sales = []; state.nextSaleNo = 1; state.last = null; save(); renderSales(); renderSell(); toast('Sales cleared. Stock put back.');
+  });
+});
+
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Escape') return;
+  if (!$('#scanner').hidden) closeScanner(); else if (!$('#sheet').hidden) closeSheet(); else if (!$('#copyBox').hidden) $('#copyBox').hidden = true;
+});
+window.addEventListener('pagehide', function () { stopLive(); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { if (state.tab === 'stickers') drawPreview(); });
+
+/* ---------- start ---------- */
+load();
+loadLogo();
+renderStatus();
+showTab('sell');
+})();
+</script>
+
+<script>
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+}
+</script>
+</body>
+</html>
